@@ -1,0 +1,1064 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>BG3d81 · Impression 3D à Graulhet</title>
+<meta name="description" content="Impression 3D sur mesure en PETG et accessoires pour camping-car, depuis Graulhet (Tarn). Devis gratuit, expédition sous 48 h.">
+<link rel="icon" type="image/png" href="img/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Michroma&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Figtree:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout : page d'atelier — couleurs du logo BG3d81 (bleus des cubes, gris anthracite), specs en monospace */
+:root{
+  --bg:#F3F6FA; --surface:#FFFFFF; --ink:#15191F; --muted:#56606C; --line:#D6DEE8;
+  --accent:#0A66D6; --accent-ink:#FFFFFF; --sky:#0477C2; --sky-soft:#E0F1FD;
+  --band:#E8EEF5; --tile:#434343; --danger:#B3261E;
+  --f-brand:"Michroma", "Segoe UI", system-ui, sans-serif;
+  --f-display:"Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body:"Figtree", "Segoe UI", system-ui, sans-serif;
+  --f-mono:"JetBrains Mono", ui-monospace, "Consolas", monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){:root{
+  --bg:#232529; --surface:#2E3135; --ink:#ECEFF3; --muted:#A3ABB5; --line:#3D4248;
+  --accent:#45B4FF; --accent-ink:#0B1520; --sky:#6CC6FF; --sky-soft:#1C3448;
+  --band:#1C1E21; --tile:#434343; --danger:#F2867E; color-scheme:dark}}
+
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:76px}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:1.0625rem;line-height:1.6}
+img{max-width:100%;display:block}
+[hidden]{display:none!important}
+a{color:var(--accent)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:4px}
+h1,h2,h3{font-family:var(--f-display);line-height:1.1;text-wrap:balance;margin:0}
+p{margin:0}
+.wrap{max-width:1080px;margin:0 auto;padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px))}
+.mono{font-family:var(--f-mono);font-size:.82rem;letter-spacing:.02em}
+.eyebrow{font-family:var(--f-mono);font-size:.78rem;text-transform:uppercase;letter-spacing:.12em;color:var(--sky)}
+
+/* Navigation */
+header.nav{position:sticky;top:0;z-index:5;background:color-mix(in srgb, var(--bg) 90%, transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+header.nav .wrap{display:flex;align-items:center;justify-content:space-between;gap:16px;padding-block:10px}
+.logo{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--ink)}
+.logo img{width:40px;height:40px;border-radius:8px;object-fit:cover}
+.logo span{font-family:var(--f-brand);font-size:1.05rem;letter-spacing:.02em}
+nav ul{display:flex;gap:4px 20px;list-style:none;margin:0;padding:0;flex-wrap:wrap;justify-content:flex-end}
+nav a{text-decoration:none;color:var(--muted);font-weight:500;font-size:.95rem}
+nav a:hover{color:var(--ink)}
+
+/* Hero */
+.hero{border-bottom:1px solid var(--line)}
+.hero .wrap{padding-block:64px 56px;display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:40px;align-items:center}
+.hero-text{display:grid;gap:22px}
+.hero h1{font-size:clamp(2.2rem,5.4vw,3.8rem);font-weight:800;max-width:17ch;letter-spacing:-.02em}
+.hero h1 em{font-style:normal;color:var(--accent)}
+.hero .lead{max-width:54ch;color:var(--muted);font-size:1.15rem}
+.hero-logo{justify-self:center;width:100%;max-width:340px;aspect-ratio:975/999;border-radius:22px;overflow:hidden;background:var(--tile);box-shadow:0 18px 40px -22px rgba(10,40,80,.55)}
+.hero-logo img{width:100%;height:100%;object-fit:cover}
+.cta-row{display:flex;gap:12px;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 20px;border-radius:8px;font-weight:600;text-decoration:none;border:2px solid var(--accent);font-family:var(--f-body);font-size:1rem;cursor:pointer}
+.btn-primary{background:var(--accent);color:var(--accent-ink)}
+.btn-ghost{background:transparent;color:var(--accent)}
+.btn-sm{padding:8px 14px;font-size:.95rem}
+.btn:hover{filter:brightness(1.08)}
+.btn[disabled]{opacity:.5;cursor:not-allowed;filter:none}
+.specs-strip{display:flex;flex-wrap:wrap;gap:8px 24px;color:var(--muted)}
+.specs-strip span b{color:var(--ink);font-weight:500}
+
+/* Sections */
+section{padding-block:72px}
+section.band{background:color-mix(in srgb, var(--band) 72%, transparent);border-block:1px solid var(--line)}
+
+/* Imprimante en fond : dessinée dans un canvas fixe, redessinée au défilement */
+#bg-printer{position:fixed;top:0;left:0;width:100%;height:100%;z-index:-1;pointer-events:none}
+.sec-head{display:grid;gap:10px;margin-bottom:36px;max-width:62ch}
+.sec-head h2{font-size:clamp(1.8rem,4vw,2.6rem);font-weight:700}
+.sec-head p{color:var(--muted)}
+
+/* Services */
+.services{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}
+.service{position:relative;isolation:isolate;overflow:hidden;border:1px solid var(--line);border-radius:12px;padding:24px;
+  display:flex;flex-direction:column;gap:10px;min-width:0;background:#0E1424;color:#FFFFFF}
+.service .art{position:relative;margin:-24px -24px -56px;z-index:-1}
+.service .art img{display:block;width:100%;height:auto;aspect-ratio:16/9;object-fit:cover}
+.service .art::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(14,20,36,0) 50%,rgba(14,20,36,.8) 82%,#0E1424 100%)}
+.service h3{font-size:1.25rem;font-weight:700;color:#FFFFFF}
+.service p{color:rgba(255,255,255,.86);font-size:.98rem;max-width:56ch}
+.service .tag{align-self:flex-start;background:rgba(255,255,255,.16);color:#FFFFFF;padding:4px 10px;border-radius:999px;backdrop-filter:blur(4px)}
+
+.machines{margin-top:36px;overflow-x:auto;border:1px solid var(--line);border-radius:10px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;min-width:560px}
+th,td{text-align:left;padding:12px 16px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-family:var(--f-mono);font-size:.75rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);font-weight:500}
+tr:last-child td{border-bottom:0}
+td.num{font-family:var(--f-mono);font-variant-numeric:tabular-nums;font-size:.9rem;white-space:nowrap}
+
+.process{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:20px;margin-top:40px;counter-reset:step}
+.step{display:grid;gap:6px;padding-top:14px;border-top:3px solid var(--accent);counter-increment:step;align-content:start}
+.step::before{content:"Étape " counter(step);font-family:var(--f-mono);font-size:.75rem;color:var(--accent);letter-spacing:.08em;text-transform:uppercase}
+.step h3{font-size:1.1rem}
+.step p{color:var(--muted);font-size:.95rem}
+
+/* Couleurs */
+.send-part{margin-top:36px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.6fr);gap:28px;align-items:start;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:24px}
+.send-part h3{font-size:1.25rem;margin-bottom:6px}
+.send-part > div > p{color:var(--muted);font-size:.95rem}
+.send-steps{list-style:none;margin:0;padding:0;display:grid;gap:12px;counter-reset:sp}
+.send-steps li{display:grid;grid-template-columns:32px 1fr;gap:12px;align-items:start;counter-increment:sp;font-size:.97rem}
+.send-steps li::before{content:counter(sp);width:32px;height:32px;border-radius:50%;display:grid;place-items:center;background:var(--sky-soft);color:var(--sky);font-family:var(--f-mono);font-weight:500}
+.send-steps strong{display:block}
+.send-steps span{color:var(--muted)}
+.colors{margin-top:36px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:28px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:24px}
+.colors h3{font-size:1.25rem;margin-bottom:6px}
+.colors p{color:var(--muted);font-size:.95rem}
+.swatches{list-style:none;margin:16px 0 0;padding:0;display:flex;flex-wrap:wrap;gap:8px}
+.swatches li{display:inline-flex;align-items:center;gap:8px;padding:5px 12px 5px 6px;border:1px solid var(--line);border-radius:999px;font-size:.9rem;background:var(--bg)}
+.swatches li::before{content:"";width:18px;height:18px;border-radius:50%;background:var(--c);box-shadow:inset 0 0 0 1px rgba(0,0,0,.18)}
+.colors img{width:100%;height:auto;border-radius:8px}
+
+/* Réalisations */
+.gallery{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));grid-auto-rows:230px;gap:12px}
+.shot{position:relative;display:block;border-radius:10px;overflow:hidden;border:1px solid var(--line);background:var(--surface);cursor:zoom-in}
+.shot.wide{grid-column:span 2}
+.shot img{width:100%;height:100%;object-fit:cover;transition:transform .3s}
+.shot:hover img{transform:scale(1.04)}
+.shot .cap{position:absolute;left:0;right:0;bottom:0;padding:22px 12px 10px;color:#FFFFFF;font-size:.88rem;font-weight:500;
+  background:linear-gradient(transparent,rgba(0,0,0,.72))}
+.gallery-note{margin-top:16px;color:var(--muted);font-size:.9rem}
+dialog.lightbox{padding:0;border:0;background:transparent;max-width:min(96vw,1100px);max-height:94vh;color:#FFFFFF}
+dialog.lightbox::backdrop{background:rgba(8,12,18,.88)}
+.lb-inner{display:grid;gap:10px;justify-items:center}
+.lb-inner img{max-width:100%;max-height:80vh;width:auto;border-radius:8px}
+.lb-bar{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%}
+.lb-bar p{margin:0;font-size:.95rem;flex:1;text-align:center}
+.lb-btn{border:1px solid rgba(255,255,255,.35);background:rgba(255,255,255,.08);color:#FFFFFF;border-radius:8px;padding:8px 14px;font:inherit;cursor:pointer}
+.lb-btn:hover{background:rgba(255,255,255,.18)}
+
+/* Boutique */
+.products{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px}
+.product{background:var(--surface);border:1px solid var(--line);border-radius:10px;overflow:hidden;display:flex;flex-direction:column;min-width:0}
+.product .visual{aspect-ratio:1/1;max-width:100%;background:#FFFFFF;border-bottom:1px solid var(--line)}
+.product .visual img{width:100%;height:100%;object-fit:contain}
+.product .body{padding:18px 20px;display:grid;gap:8px;flex:1;align-content:start}
+.product h3{font-size:1.1rem;font-weight:700}
+.product p{color:var(--muted);font-size:.95rem}
+.product .spec{color:var(--sky)}
+.product .meta{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px 12px;padding:14px 20px;border-top:1px solid var(--line)}
+.price{font-family:var(--f-mono);font-weight:500;font-variant-numeric:tabular-nums;white-space:nowrap;font-size:1.05rem}
+.price small{display:block;font-family:var(--f-body);font-weight:400;color:var(--muted);font-size:.8rem}
+.shop-foot{margin-top:28px;display:flex;flex-wrap:wrap;gap:16px 28px;align-items:center;justify-content:space-between}
+.custom{flex:1 1 380px;display:flex;flex-wrap:wrap;gap:12px 20px;align-items:center;justify-content:space-between;padding:18px 20px;border-radius:10px;background:var(--surface);border:1px dashed var(--accent);min-width:0}
+.custom p{color:var(--muted);flex:1 1 240px}
+.custom strong{color:var(--ink)}
+.note{margin-top:20px;color:var(--muted);font-size:.9rem}
+
+/* À propos */
+.about{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:48px;align-items:start}
+.about .text{display:grid;gap:16px;max-width:62ch}
+.about h2{font-size:clamp(1.8rem,4vw,2.6rem)}
+.about-side{display:grid;gap:20px}
+.portrait{width:100%;max-width:300px;aspect-ratio:1/1;border-radius:14px;overflow:hidden;border:1px solid var(--line);background:var(--surface)}
+.portrait img{width:100%;height:100%;object-fit:cover}
+.facts{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:24px}
+.facts dl{margin:0;display:grid;gap:12px}
+.facts div{display:grid;grid-template-columns:120px 1fr;gap:12px}
+.facts dt{font-family:var(--f-mono);font-size:.78rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);padding-top:3px}
+.facts dd{margin:0}
+
+/* Demande de devis */
+.quote{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:32px;align-items:start}
+.form-card{display:grid;gap:16px;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:24px}
+.row{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:14px}
+label,.label{display:grid;gap:6px;font-weight:500;font-size:.95rem}
+label small,.label small{color:var(--muted);font-weight:400}
+.req{color:var(--accent)}
+.lt{display:block}
+input,select,textarea{font:inherit;font-size:1rem;padding:10px 12px;border:1px solid var(--line);border-radius:7px;background:var(--bg);color:var(--ink);width:100%}
+textarea{min-height:120px;resize:vertical}
+.honey{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+
+.limit-note{margin:0;padding:10px 12px;border-radius:7px;background:var(--sky-soft);color:var(--ink);font-weight:400;font-size:.92rem;border:1px solid color-mix(in srgb,var(--sky) 35%,transparent)}
+.limit-note strong{color:var(--sky);font-weight:600}
+.drop{position:relative;display:flex;align-items:center;gap:12px;padding:16px;border:2px dashed var(--line);border-radius:8px;background:var(--bg);cursor:pointer;font-weight:500}
+.drop:hover,.drop.over{border-color:var(--accent)}
+.drop:focus-within{outline:2px solid var(--accent);outline-offset:2px}
+.drop input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%}
+.drop small{display:block;color:var(--muted);font-weight:400}
+.drop-icon{width:34px;height:34px;flex:none;border-radius:7px;display:grid;place-items:center;background:var(--accent);color:var(--accent-ink);font-size:1.2rem}
+.file-list{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.file-list li{display:flex;align-items:center;gap:10px;padding:8px 10px;border:1px solid var(--line);border-radius:7px;background:var(--surface);min-width:0}
+.file-list .fname{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.file-list .fsize{font-family:var(--f-mono);font-size:.8rem;color:var(--muted);font-variant-numeric:tabular-nums}
+.file-list button{border:0;background:none;color:var(--muted);cursor:pointer;font-size:1.1rem;padding:2px 6px;border-radius:5px}
+.file-list button:hover{color:var(--ink)}
+.gauge{display:grid;gap:6px}
+.gauge-bar{height:8px;border-radius:999px;background:var(--band);overflow:hidden;border:1px solid var(--line)}
+.gauge-fill{height:100%;width:0;background:var(--accent);transition:width .2s}
+.gauge.busy .gauge-fill{background:repeating-linear-gradient(-45deg,var(--accent) 0 8px,color-mix(in srgb,var(--accent) 55%,transparent) 8px 16px)}
+.gauge.over .gauge-fill{background:var(--danger)}
+.gauge-text{display:flex;justify-content:space-between;gap:8px;color:var(--muted)}
+.gauge.over .gauge-text{color:var(--danger)}
+.gauge-detail{color:var(--muted);font-size:.85rem}
+
+.wt-box{display:grid;gap:10px;padding:14px;border:1px solid var(--line);border-radius:8px;background:var(--bg)}
+.wt-box.highlight{border:2px solid var(--danger);background:color-mix(in srgb,var(--danger) 8%,var(--bg))}
+.wt-head{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px 12px}
+.wt-head strong{font-weight:600}
+.wt-box p{margin:0;color:var(--muted);font-size:.92rem}
+
+.side{background:var(--surface);border:1px dashed var(--accent);border-radius:10px;padding:22px;display:grid;gap:14px;position:sticky;top:90px}
+.side h3{font-size:1.2rem}
+.side ol{margin:0;padding-left:20px;display:grid;gap:6px;color:var(--muted);font-size:.95rem}
+.error{color:var(--danger);font-size:.92rem;min-height:1.2em}
+.contact-line{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center;color:var(--muted);font-size:.95rem}
+.contact-line code{font-family:var(--f-mono);user-select:all;background:var(--bg);padding:4px 8px;border-radius:5px;border:1px solid var(--line);color:var(--ink)}
+
+footer{padding-block:32px;border-top:1px solid var(--line);color:var(--muted);font-size:.9rem}
+footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
+footer .brand{font-family:var(--f-brand);font-size:.85rem;color:var(--ink)}
+
+@media (max-width:900px){
+  .gallery{grid-template-columns:repeat(2,minmax(0,1fr));grid-auto-rows:200px}
+}
+@media (max-width:760px){
+  .colors,.send-part{grid-template-columns:1fr}
+  .hero .wrap{grid-template-columns:1fr;padding-block:40px 44px;gap:28px}
+  .hero-logo{order:-1;max-width:180px;justify-self:start;border-radius:16px}
+  .about,.quote{grid-template-columns:1fr}
+  .side{position:static}
+  nav a{font-size:.88rem}
+  section{padding-block:56px}
+  .facts div{grid-template-columns:1fr;gap:2px}
+}
+@media (max-width:560px){ .services{grid-template-columns:1fr} }
+@media (max-width:520px){ nav{display:none} .gallery{grid-auto-rows:160px} }
+@media (prefers-reduced-motion:reduce){ html{scroll-behavior:auto} .gauge-fill,.shot img{transition:none} .shot:hover img{transform:none} }
+</style>
+</head>
+<body>
+<canvas id="bg-printer" aria-hidden="true"></canvas>
+
+<header class="nav">
+  <div class="wrap">
+    <a class="logo" href="#accueil"><img src="img/logo-bg3d81-96.jpg" alt="" width="40" height="40"><span>BG3d81</span></a>
+    <nav aria-label="Navigation principale">
+      <ul>
+        <li><a href="#services">Impression 3D</a></li>
+        <li><a href="#realisations">Réalisations</a></li>
+        <li><a href="#boutique">Boutique</a></li>
+        <li><a href="#apropos">À propos</a></li>
+        <li><a href="#devis">Devis</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main id="accueil">
+  <div class="hero">
+    <div class="wrap">
+      <div class="hero-text">
+        <span class="eyebrow">Atelier d'impression 3D · Graulhet, Tarn</span>
+        <h1>Impression 3D <em>sur mesure</em>.</h1>
+        <p class="lead">J'imprime vos fichiers, je dessine les pièces qui n'existent plus dans le commerce, et je fabrique des accessoires pour camping-car et caravane, vendus sur eBay.</p>
+        <div class="cta-row">
+          <a class="btn btn-primary" href="#devis">Demander un devis</a>
+          <a class="btn btn-ghost" href="#boutique">Voir la boutique</a>
+        </div>
+        <div class="specs-strip mono" aria-label="En bref">
+          <span>Matière <b>PETG</b></span>
+          <span>Volume max <b>300 × 300 × 400 mm</b></span>
+          <span>Expédition <b>sous 48 h</b></span>
+        </div>
+      </div>
+      <div class="hero-logo"><img src="img/logo-bg3d81.jpg" alt="Logo BG3d81 : des cubes bleus assemblés en hexagone" width="560" height="574"></div>
+    </div>
+  </div>
+
+  <section id="services">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="eyebrow">Services</span>
+        <h2>Ce que je peux faire pour vous</h2>
+        <p>Vous avez un fichier, un croquis, ou juste une pièce cassée dans la main ? On part de là. Toutes les pièces sont imprimées en PETG, un plastique solide qui supporte la chaleur, le soleil et l'humidité.</p>
+      </div>
+
+      <div class="services">
+        <article class="service">
+          <div class="art"><img src="img/services/fichier.jpg" alt="" width="832" height="467" loading="lazy"></div>
+          <span class="tag mono">Vous avez le fichier</span>
+          <h3>Impression de vos fichiers</h3>
+          <p>Envoyez un STL, 3MF ou STEP. Je vérifie qu'il est imprimable, je vous conseille sur l'orientation et le remplissage, puis j'imprime.</p>
+        </article>
+        <article class="service">
+          <div class="art"><img src="img/services/idee.jpg" alt="" width="832" height="467" loading="lazy"></div>
+          <span class="tag mono">Vous avez une idée</span>
+          <h3>Conception sur mesure</h3>
+          <p>À partir d'un croquis avec des cotes ou de quelques photos, je dessine la pièce en CAO et vous envoie un aperçu avant impression.</p>
+        </article>
+        <article class="service">
+          <div class="art"><img src="img/services/piece-cassee.jpg" alt="" width="832" height="467" loading="lazy"></div>
+          <span class="tag mono">Vous avez une pièce cassée</span>
+          <h3>Pièces de remplacement</h3>
+          <p>Clips, boutons, supports, caches, pièces d'électroménager ou de véhicule de loisir : je reproduis la pièce d'origine, souvent en plus solide. Vous pouvez m'envoyer la pièce cassée, ou une pièce identique en bon état.</p>
+        </article>
+        <article class="service">
+          <div class="art"><img src="img/services/projet.jpg" alt="" width="832" height="467" loading="lazy"></div>
+          <span class="tag mono">Vous avez un projet</span>
+          <h3>Prototypes et boîtiers</h3>
+          <p>Boîtiers pour montages électroniques (ESP32, Arduino), supports, gabarits, petites séries. Je parle le même langage que les bricoleurs.</p>
+        </article>
+      </div>
+
+      <div class="machines" role="region" aria-label="Machines de l'atelier" tabindex="0">
+        <table>
+          <thead><tr><th>Machine</th><th>Volume d'impression</th><th>Idéale pour</th></tr></thead>
+          <tbody>
+            <tr><td>Bambu Lab A1</td><td class="num">256 × 256 × 256 mm</td><td>Pièces précises et finitions soignées, impression rapide</td></tr>
+            <tr><td>Artillery Sidewinder X4 Plus</td><td class="num">300 × 300 × 400 mm</td><td>Grandes pièces et objets hauts</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="send-part" id="envoyer-piece">
+        <div>
+          <h3>Envoyez-moi la pièce à reproduire</h3>
+          <p>Rien ne vaut la pièce en main pour prendre des mesures exactes. Envoyez la pièce cassée, même en morceaux, ou une pièce jumelle en bon état.</p>
+        </div>
+        <ol class="send-steps">
+          <li><div><strong>Faites votre demande de devis</strong><span>Indiquez dans le formulaire que vous pouvez envoyer la pièce, avec quelques photos.</span></div></li>
+          <li><div><strong>Je vous indique où l'envoyer</strong><span>Je vous réponds par e-mail avec le point relais près de Graulhet où expédier votre colis.</span></div></li>
+          <li><div><strong>Je mesure, je modélise, j'imprime</strong><span>Vous recevez la nouvelle pièce, avec votre pièce d'origine si vous souhaitez la récupérer.</span></div></li>
+        </ol>
+      </div>
+
+      <div class="colors">
+        <div>
+          <h3>Couleurs en stock</h3>
+          <p>Toutes les impressions sont en PETG. Voici les couleurs disponibles en ce moment ; une autre teinte est possible sur demande, avec un délai de commande du filament.</p>
+          <ul class="swatches">
+            <li style="--c:#111111">Noir</li>
+            <li style="--c:#F7F7F5">Blanc</li>
+            <li style="--c:#EFE6D2">Crème</li>
+            <li style="--c:#F2E3A4">Jaune pâle</li>
+            <li style="--c:#F07A1A">Orange</li>
+            <li style="--c:#D9202A">Rouge</li>
+            <li style="--c:#C793C9">Lilas</li>
+            <li style="--c:#1BA9C4">Turquoise</li>
+            <li style="--c:#0E8E70">Vert émeraude</li>
+            <li style="--c:#7A4A2A">Marron</li>
+          </ul>
+        </div>
+        <img src="img/filaments.jpg" alt="Bobines de filament PETG de dix couleurs empilées" width="1000" height="548" loading="lazy">
+      </div>
+
+      <div class="process">
+        <div class="step"><h3>Vous décrivez</h3><p>Fichier, photos, croquis coté ou la pièce elle-même, et l'usage prévu.</p></div>
+        <div class="step"><h3>Je chiffre</h3><p>Prix et délai par e-mail, sans engagement.</p></div>
+        <div class="step"><h3>J'imprime</h3><p>Avec une photo de la pièce avant envoi si vous le souhaitez.</p></div>
+        <div class="step"><h3>Vous recevez</h3><p>Expédition sous 48 h une fois la pièce prête, ou remise en main propre autour de Graulhet.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="realisations">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="eyebrow">Réalisations</span>
+        <h2>Quelques pièces sorties de l'atelier</h2>
+        <p>Objets utiles, déco, pièces démontables : un aperçu de ce que je fabrique. Touchez une photo pour l'agrandir.</p>
+      </div>
+      <div class="gallery" id="gallery">
+        <a class="shot wide" href="img/realisations/derouleurs-essuie-tout.jpg" data-cap="Dérouleurs d'essuie-tout, en trois couleurs"><img src="img/realisations/derouleurs-essuie-tout-mini.jpg" alt="Dérouleurs d'essuie-tout, en trois couleurs" loading="lazy"><span class="cap">Dérouleurs d'essuie-tout, en trois couleurs</span></a>
+        <a class="shot" href="img/realisations/bouddha-jaune.jpg" data-cap="Pot tête de Bouddha"><img src="img/realisations/bouddha-jaune-mini.jpg" alt="Pot tête de Bouddha" loading="lazy"><span class="cap">Pot tête de Bouddha</span></a>
+        <a class="shot" href="img/realisations/bouddha-turquoise.jpg" data-cap="Pot tête de Bouddha, version turquoise"><img src="img/realisations/bouddha-turquoise-mini.jpg" alt="Pot tête de Bouddha, version turquoise" loading="lazy"><span class="cap">Pot tête de Bouddha, version turquoise</span></a>
+        <a class="shot" href="img/realisations/cache-pot-multicolore.jpg" data-cap="Cache-pot texturé en deux parties"><img src="img/realisations/cache-pot-multicolore-mini.jpg" alt="Cache-pot texturé en deux parties" loading="lazy"><span class="cap">Cache-pot texturé en deux parties</span></a>
+        <a class="shot" href="img/realisations/cache-pot-dessus.jpg" data-cap="Le même cache-pot, vu de dessus"><img src="img/realisations/cache-pot-dessus-mini.jpg" alt="Le même cache-pot, vu de dessus" loading="lazy"><span class="cap">Le même cache-pot, vu de dessus</span></a>
+        <a class="shot wide" href="img/realisations/derouleurs-pieces.jpg" data-cap="Dérouleurs démontés : support et axe vissé"><img src="img/realisations/derouleurs-pieces-mini.jpg" alt="Dérouleurs démontés : support et axe vissé" loading="lazy"><span class="cap">Dérouleurs démontés : support et axe vissé</span></a>
+        <a class="shot wide" href="img/realisations/cache-pots-deux-parties.jpg" data-cap="Intérieur des deux parties du cache-pot"><img src="img/realisations/cache-pots-deux-parties-mini.jpg" alt="Intérieur des deux parties du cache-pot" loading="lazy"><span class="cap">Intérieur des deux parties du cache-pot</span></a>
+        <a class="shot" href="img/realisations/bouddha-supports.jpg" data-cap="Pot Bouddha à la sortie de l'imprimante, avec ses supports"><img src="img/realisations/bouddha-supports-mini.jpg" alt="Pot Bouddha à la sortie de l'imprimante, avec ses supports" loading="lazy"><span class="cap">Pot Bouddha à la sortie de l'imprimante, avec ses supports</span></a>
+        <a class="shot" href="img/realisations/bouddha-impression.jpg" data-cap="Le même pot en cours d'impression"><img src="img/realisations/bouddha-impression-mini.jpg" alt="Le même pot en cours d'impression" loading="lazy"><span class="cap">Le même pot en cours d'impression</span></a>
+      </div>
+    </div>
+  </section>
+
+  <section id="boutique" class="band">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="eyebrow">Boutique</span>
+        <h2>Accessoires pour camping-car et caravane</h2>
+        <p>Des pièces simples qui cassent ou disparaissent souvent, conçues et imprimées à l'atelier en PETG. La vente passe par eBay, avec paiement sécurisé et suivi. Couleur au choix sur la plupart des modèles.</p>
+      </div>
+
+      <div class="products">
+        <article class="product">
+          <div class="visual"><img src="https://i.ebayimg.com/images/g/sA8AAeSwZQpp4nGp/s-l500.jpg" alt="Grille d'aération blanche pour l'échappement du frigo d'un camping-car" loading="lazy"></div>
+          <div class="body">
+            <span class="spec mono">Couleur : blanc</span>
+            <h3>Grille d'aération de frigo</h3>
+            <p>Grille de remplacement pour l'échappement du réfrigérateur de camping-car.</p>
+          </div>
+          <div class="meta"><span class="price">6,00 €<small>l'unité</small></span><a class="btn btn-ghost btn-sm" href="https://www.ebay.fr/itm/206216449075" target="_blank" rel="noopener">Sur eBay ↗</a></div>
+        </article>
+
+        <article class="product">
+          <div class="visual"><img src="https://i.ebayimg.com/images/g/1yAAAeSwSkFqqZuV/s-l500.jpg" alt="Deux sabots de pied de store banne pour camping-car" loading="lazy"></div>
+          <div class="body">
+            <span class="spec mono">50 × 30 mm · couleur au choix</span>
+            <h3>Sabots de pied de store banne</h3>
+            <p>Protègent le sol et stabilisent les pieds d'auvent de camping-car ou de caravane.</p>
+          </div>
+          <div class="meta"><span class="price">9,25 €<small>la paire</small></span><a class="btn btn-ghost btn-sm" href="https://www.ebay.fr/itm/206556991790" target="_blank" rel="noopener">Sur eBay ↗</a></div>
+        </article>
+
+        <article class="product">
+          <div class="visual"><img src="https://i.ebayimg.com/images/g/8kcAAeSw61RqiCdI/s-l500.jpg" alt="Accroche de porte de camping-car pour maintenir la porte ouverte" loading="lazy"></div>
+          <div class="body">
+            <span class="spec mono">Lot de 2 · couleur au choix</span>
+            <h3>Accroche porte de camping-car</h3>
+            <p>Butée de remplacement qui maintient la porte ouverte. Installation facile.</p>
+          </div>
+          <div class="meta"><span class="price">5,00 €<small>le lot</small></span><a class="btn btn-ghost btn-sm" href="https://www.ebay.fr/itm/206556888739" target="_blank" rel="noopener">Sur eBay ↗</a></div>
+        </article>
+
+        <article class="product">
+          <div class="visual"><img src="https://i.ebayimg.com/images/g/nN8AAeSw7dJqiB4~/s-l500.jpg" alt="Casquette pare-soleil collée au-dessus d'une caméra de recul" loading="lazy"></div>
+          <div class="body">
+            <span class="spec mono">40 × 51 × 25 mm</span>
+            <h3>Casquette de caméra de recul</h3>
+            <p>Se colle au-dessus de la caméra et la protège de la pluie et du soleil.</p>
+          </div>
+          <div class="meta"><span class="price">10,00 €<small>l'unité</small></span><a class="btn btn-ghost btn-sm" href="https://www.ebay.fr/itm/206508208541" target="_blank" rel="noopener">Sur eBay ↗</a></div>
+        </article>
+      </div>
+
+      <div class="shop-foot">
+        <div class="custom">
+          <p><strong>Vous ne trouvez pas votre pièce ?</strong> Donnez-moi les cotes ou une photo, je la dessine pour votre véhicule.</p>
+          <a class="btn btn-primary btn-sm" href="#devis">Demander un devis</a>
+        </div>
+        <a class="btn btn-ghost btn-sm" href="https://www.ebay.fr/usr/bg3d-81" target="_blank" rel="noopener">Toute la boutique eBay ↗</a>
+      </div>
+      <p class="note">Prix vendeur, hors frais de port et frais de protection eBay. Les achats se font uniquement sur eBay : ce site ne prend ni commande ni paiement.</p>
+    </div>
+  </section>
+
+  <section id="apropos">
+    <div class="wrap about">
+      <div class="text">
+        <span class="eyebrow">À propos</span>
+        <h2>Un atelier, une personne</h2>
+        <p>Je m'appelle Gianny, j'habite à Graulhet. Je suis autodidacte : j'ai appris l'électronique, la conception 3D et l'impression en construisant mes propres projets, des petits robots sur ESP32 aux imprimantes que je modifie moi-même.</p>
+        <p>Mes accessoires pour camping-car sont nés de besoins concrets lors de voyages en famille. Depuis, je les dessine et je les imprime pour d'autres camping-caristes.</p>
+        <p>J'aime les demandes un peu atypiques. Si vous ne savez pas si c'est faisable, écrivez-moi : je vous réponds honnêtement.</p>
+      </div>
+      <div class="about-side">
+        <div class="portrait"><img src="img/gianny.jpg" alt="Portrait illustré de Gianny, souriant, avec des lunettes" width="520" height="520" loading="lazy"></div>
+        <aside class="facts" aria-label="En bref">
+          <dl>
+            <div><dt>Atelier</dt><dd>Graulhet (81), Tarn</dd></div>
+            <div><dt>Statut</dt><dd>Particulier</dd></div>
+            <div><dt>Matière</dt><dd>PETG, plusieurs couleurs</dd></div>
+            <div><dt>Livraison</dt><dd>Envoi postal sous 48 h ou remise en main propre</dd></div>
+            <div><dt>Contact</dt><dd>Par message écrit, de préférence</dd></div>
+            <div><dt>TikTok</dt><dd><a href="https://www.tiktok.com/@giannyblard" target="_blank" rel="noopener">@giannyblard</a></dd></div>
+          </dl>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <section id="devis" class="band">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="eyebrow">Devis gratuit</span>
+        <h2>Décrivez votre pièce</h2>
+        <p>Les champs marqués d'une <span class="req">*</span> sont obligatoires, le reste peut rester vide. Je vous réponds par e-mail avec un prix et un délai.</p>
+      </div>
+
+      <div class="quote">
+        <form id="quote-form" class="form-card" action="https://formsubmit.co/bg3d81@gmail.com" method="POST" enctype="multipart/form-data">
+          <!-- Réglages FormSubmit -->
+          <input type="hidden" name="_subject" id="f-subject" value="Nouvelle demande de devis (site BG3d81)">
+          <input type="hidden" name="_next" id="f-next" value="">
+          <input type="hidden" name="_template" value="table">
+          <div class="honey" aria-hidden="true"><label for="f-honey">Ne pas remplir</label><input type="text" name="_honey" id="f-honey" tabindex="-1" autocomplete="off"></div>
+
+          <div class="row">
+            <label for="q-name"><span class="lt">Prénom <span class="req">*</span></span><input id="q-name" name="Prénom" autocomplete="given-name" required placeholder="Ex. Martine"></label>
+            <label for="q-email"><span class="lt">E-mail <span class="req">*</span></span><input id="q-email" name="email" type="email" autocomplete="email" required placeholder="vous@exemple.fr"></label>
+          </div>
+          <div class="row">
+            <label for="q-type"><span class="lt">Type de demande</span>
+              <select id="q-type" name="Type de demande">
+                <option>Impression de mon fichier</option>
+                <option>Pièce de remplacement</option>
+                <option>Conception sur mesure</option>
+                <option>Accessoire camping-car sur mesure</option>
+                <option>Autre</option>
+              </select>
+            </label>
+            <label for="q-use"><span class="lt">Usage</span>
+              <select id="q-use" name="Usage">
+                <option>Intérieur</option>
+                <option>Extérieur / soleil</option>
+                <option>Pièce mécanique</option>
+                <option>Décoration</option>
+                <option>Je ne sais pas</option>
+              </select>
+            </label>
+          </div>
+          <div class="row">
+            <label for="q-l"><span class="lt">Longueur <small>mm</small></span><input id="q-l" name="Longueur (mm)" type="number" min="0" step="0.1" inputmode="decimal"></label>
+            <label for="q-w"><span class="lt">Largeur <small>mm</small></span><input id="q-w" name="Largeur (mm)" type="number" min="0" step="0.1" inputmode="decimal"></label>
+            <label for="q-h"><span class="lt">Hauteur <small>mm</small></span><input id="q-h" name="Hauteur (mm)" type="number" min="0" step="0.1" inputmode="decimal"></label>
+          </div>
+          <div class="row">
+            <label for="q-qty"><span class="lt">Quantité</span><input id="q-qty" name="Quantité" type="number" min="1" value="1"></label>
+            <label for="q-color"><span class="lt">Couleur souhaitée</span><input id="q-color" name="Couleur" placeholder="Ex. noir, blanc…"></label>
+            <label for="q-delivery"><span class="lt">Réception</span>
+              <select id="q-delivery" name="Réception">
+                <option>Envoi postal</option>
+                <option>Remise en main propre (Graulhet)</option>
+                <option>Peu importe</option>
+              </select>
+            </label>
+          </div>
+          <label for="q-part"><span class="lt">Pièce d'origine</span>
+            <select id="q-part" name="Pièce d'origine">
+              <option>Je n'envoie pas de pièce</option>
+              <option>Je peux envoyer la pièce cassée</option>
+              <option>Je peux envoyer une pièce identique en bon état</option>
+              <option>Je peux la remettre en main propre (Graulhet)</option>
+            </select>
+          </label>
+          <label for="q-desc"><span class="lt">Description <span class="req">*</span></span><textarea id="q-desc" name="Description" required placeholder="Ex. Clip de fixation du store de mon camping-car, cassé en deux. J'ai encore les morceaux."></textarea></label>
+
+          <div class="label">
+            <span>Fichiers et photos <small>STL, 3MF, STEP, OBJ, PDF, photos</small></span>
+            <p class="limit-note" id="q-limit-note"><strong>Taille maximale : 10 Mo au total</strong>, après compression. Vos fichiers sont compressés automatiquement en .zip avant l'envoi, ce qui réduit souvent beaucoup leur poids. Pour les fichiers trop lourds, utilisez WeTransfer plus bas.</p>
+            <label class="drop" for="q-files" id="q-drop">
+              <input id="q-files" type="file" multiple accept=".stl,.3mf,.step,.stp,.obj,.f3d,.pdf,image/*" aria-describedby="q-limit-note">
+              <span class="drop-icon" aria-hidden="true">＋</span>
+              <span>Choisir des fichiers <small>ou les glisser ici · 10 Mo max au total</small></span>
+            </label>
+            <ul class="file-list" id="q-list"></ul>
+            <div class="gauge" id="q-gauge" hidden>
+              <div class="gauge-bar"><div class="gauge-fill" id="q-gauge-fill"></div></div>
+              <div class="gauge-text mono"><span id="q-gauge-used">0 Ko</span><span>sur 10 Mo</span></div>
+              <span class="gauge-detail" id="q-gauge-detail"></span>
+            </div>
+          </div>
+
+          <div class="wt-box" id="q-wt">
+            <div class="wt-head">
+              <strong>Fichiers trop lourds ?</strong>
+              <a class="btn btn-ghost btn-sm" href="https://wetransfer.com/" target="_blank" rel="noopener">Ouvrir WeTransfer ↗</a>
+            </div>
+            <p>Envoyez-les gratuitement avec WeTransfer : ajoutez vos fichiers, choisissez « Obtenir un lien » dans les options, puis collez ce lien ici.</p>
+            <label for="q-link"><span class="lt">Lien WeTransfer ou Google Drive</span><input id="q-link" name="Lien fichiers" type="url" placeholder="https://we.tl/…"></label>
+          </div>
+
+          <div id="q-files-slot" hidden></div>
+          <p class="error" id="q-error" role="alert"></p>
+          <button class="btn btn-primary" type="submit" id="q-send">Envoyer ma demande</button>
+        </form>
+
+        <aside class="side">
+          <h3>Comment ça se passe</h3>
+          <ol>
+            <li>Vous envoyez le formulaire avec vos fichiers, compressés automatiquement.</li>
+            <li>Une courte vérification anti-robot s'affiche.</li>
+            <li>Je reçois tout et je vous réponds par e-mail.</li>
+          </ol>
+          <p style="color:var(--muted);font-size:.95rem">Vos fichiers ne servent qu'à étudier votre demande. Ils ne sont ni partagés ni réutilisés.</p>
+          <div class="contact-line"><span>Vous préférez écrire directement ?</span><code>bg3d81@gmail.com</code></div>
+        </aside>
+      </div>
+    </div>
+  </section>
+</main>
+
+<dialog class="lightbox" id="lb" aria-label="Photo agrandie">
+  <div class="lb-inner">
+    <img id="lb-img" src="" alt="">
+    <div class="lb-bar">
+      <button class="lb-btn" type="button" id="lb-prev" aria-label="Photo précédente">←</button>
+      <p id="lb-cap"></p>
+      <button class="lb-btn" type="button" id="lb-next" aria-label="Photo suivante">→</button>
+      <button class="lb-btn" type="button" id="lb-close">Fermer</button>
+    </div>
+  </div>
+</dialog>
+
+<footer>
+  <div class="wrap">
+    <span><span class="brand">BG3d81</span> · Impression 3D à Graulhet (81)</span>
+    <span>Vente via <a href="https://www.ebay.fr/usr/bg3d-81" target="_blank" rel="noopener">eBay</a> · Particulier · <a href="https://www.tiktok.com/@giannyblard" target="_blank" rel="noopener">TikTok</a></span>
+  </div>
+</footer>
+
+<script>
+// Imprimante 3D en fond : la buse en haut de la page, le plateau en bas,
+// et entre les deux un grand vase en cours d'impression qui défile avec la page.
+(function(){
+  var cv = document.getElementById('bg-printer');
+  if (!cv || !cv.getContext) return;
+  var ctx = cv.getContext('2d');
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
+  var dark = window.matchMedia('(prefers-color-scheme: dark)');
+  var K = 0.85;                 // vitesse du fond par rapport à la page (effet de profondeur)
+  var W = 0, H = 0, dpr = 1, docH = 0, theta = 0, last = 0, animating = false, queued = false;
+  var C = {};
+
+  function readColors(){
+    var cs = getComputedStyle(document.documentElement);
+    C.accent = cs.getPropertyValue('--accent').trim() || '#0A66D6';
+    C.muted  = cs.getPropertyValue('--muted').trim()  || '#56606C';
+    C.tile   = cs.getPropertyValue('--tile').trim()   || '#434343';
+    C.dark   = dark.matches;
+  }
+  function clamp(v, a, b){ return Math.max(a, Math.min(b, v)); }
+
+  // Profil du vase : rayon en fonction de la hauteur (ondulations comme un vase en mode spirale)
+  function radius(y, R){
+    return R * (0.62 + 0.20 * Math.sin(y / 150) + 0.08 * Math.sin(y / 41));
+  }
+
+  function roundRect(x, y, w, h, r){
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.arcTo(x + w, y, x + w, y + h, r);
+    ctx.arcTo(x + w, y + h, x, y + h, r);
+    ctx.arcTo(x, y + h, x, y, r);
+    ctx.arcTo(x, y, x + w, y, r);
+    ctx.closePath();
+  }
+
+  function draw(){
+    queued = false;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, W, H);
+
+    var off = window.scrollY * K;                 // décalage du décor
+    var S = H + Math.max(0, docH - H) * K;        // hauteur totale du décor
+    var cx = W / 2;
+    var F = clamp(W * 0.30, 130, 360);            // demi-largeur du cadre
+    var R = F * 0.58;                             // rayon moyen du vase
+    var yTop = 300, yBot = S - 70;               // haut du vase (sous la buse) et plateau
+    var base = C.dark ? 1.25 : 1;                 // un peu plus visible en mode sombre
+
+    // Montants verticaux (axe Z)
+    ctx.globalAlpha = 0.13 * base;
+    ctx.fillStyle = C.muted;
+    var railTop = 60 - off, railH = (S - 30) - 60;
+    ctx.fillRect(cx - F - 9, railTop, 18, railH);
+    ctx.fillRect(cx + F - 9, railTop, 18, railH);
+    // Chapeau du cadre
+    roundRect(cx - F - 14, 46 - off, 2 * F + 28, 22, 8); ctx.fill();
+
+    // Vase : seulement la partie visible à l'écran
+    var y0 = Math.max(yTop, off - 30), y1 = Math.min(yBot, off + H + 30);
+    if (y0 < y1){
+      var step = 6, y;
+      ctx.beginPath();
+      for (y = y0; y <= y1; y += step) ctx.lineTo(cx - radius(y, R), y - off);
+      for (y = y1; y >= y0; y -= step) ctx.lineTo(cx + radius(y, R), y - off);
+      ctx.closePath();
+      ctx.globalAlpha = 0.07 * base;
+      ctx.fillStyle = C.accent; ctx.fill();
+
+      // Couches d'impression
+      ctx.strokeStyle = C.accent;
+      ctx.lineWidth = 1.2;
+      ctx.globalAlpha = 0.20 * base;
+      for (y = Math.ceil(y0 / 7) * 7; y <= y1; y += 7){
+        var r = radius(y, R);
+        ctx.beginPath();
+        ctx.ellipse(cx, y - off, r, r * 0.09, 0, 0, Math.PI);
+        ctx.stroke();
+      }
+      // Contours
+      ctx.globalAlpha = 0.30 * base;
+      ctx.lineWidth = 1.6;
+      ['-', '+'].forEach(function(side){
+        ctx.beginPath();
+        for (var yy = y0; yy <= y1; yy += step){
+          var rr = radius(yy, R);
+          ctx.lineTo(side === '-' ? cx - rr : cx + rr, yy - off);
+        }
+        ctx.stroke();
+      });
+    }
+
+    // Haut de la pièce, tête d'impression et buse (en haut de page)
+    if (off < 420){
+      var rt = radius(yTop, R);
+      ctx.globalAlpha = 0.35 * base;
+      ctx.strokeStyle = C.accent; ctx.lineWidth = 1.6;
+      ctx.beginPath(); ctx.ellipse(cx, yTop - off, rt, rt * 0.14, 0, 0, Math.PI * 2); ctx.stroke();
+
+      // Filament fraîchement déposé : un arc lumineux qui suit la buse
+      ctx.globalAlpha = 0.9;
+      ctx.lineWidth = 3;
+      ctx.beginPath(); ctx.ellipse(cx, yTop - off, rt, rt * 0.14, 0, theta - 0.9, theta); ctx.stroke();
+
+      var hx = cx + rt * Math.cos(theta);
+      var hy = yTop + rt * 0.14 * Math.sin(theta);
+
+      // Poutre horizontale (axe X)
+      ctx.globalAlpha = 0.18 * base;
+      ctx.fillStyle = C.muted;
+      roundRect(cx - F - 9, 150 - off, 2 * F + 18, 26, 6); ctx.fill();
+
+      // Tête d'impression
+      ctx.globalAlpha = 0.26 * base;
+      ctx.fillStyle = C.tile;
+      roundRect(hx - 56, 112 - off, 112, 132, 18); ctx.fill();
+      ctx.globalAlpha = 0.14 * base;
+      ctx.fillStyle = C.accent;
+      roundRect(hx - 34, 140 - off, 68, 50, 10); ctx.fill();   // ventilateur
+      // Buse
+      ctx.globalAlpha = 0.38 * base;
+      ctx.fillStyle = C.tile;
+      ctx.beginPath();
+      ctx.moveTo(hx - 16, 244 - off);
+      ctx.lineTo(hx + 16, 244 - off);
+      ctx.lineTo(hx + 4, hy - 6 - off);
+      ctx.lineTo(hx - 4, hy - 6 - off);
+      ctx.closePath(); ctx.fill();
+      // Point chaud
+      ctx.globalAlpha = 0.9;
+      ctx.fillStyle = '#FF8A3D';
+      ctx.beginPath(); ctx.arc(hx, hy - 4 - off, 2.6, 0, Math.PI * 2); ctx.fill();
+    }
+
+    // Plateau (en bas de page)
+    if (yBot - off < H + 80){
+      var rb = radius(yBot, R);
+      ctx.globalAlpha = 0.16 * base;
+      ctx.fillStyle = C.accent;
+      ctx.beginPath(); ctx.ellipse(cx, yBot - off, rb + 14, (rb + 14) * 0.12, 0, 0, Math.PI * 2); ctx.fill(); // bordure d'adhérence
+      ctx.globalAlpha = 0.24 * base;
+      ctx.fillStyle = C.muted;
+      roundRect(cx - F * 0.92, yBot + 8 - off, F * 1.84, 16, 5); ctx.fill();      // plateau
+      ctx.globalAlpha = 0.14 * base;
+      roundRect(cx - F - 20, yBot + 40 - off, 2 * F + 40, 26, 8); ctx.fill();    // socle
+      roundRect(cx - F * 0.4, yBot + 24 - off, F * 0.8, 16, 4); ctx.fill();       // rail Y
+    }
+    ctx.globalAlpha = 1;
+    return off < 420;   // la tête est visible : l'animation a un intérêt
+  }
+
+  function frame(t){
+    var dt = last ? (t - last) / 1000 : 0;
+    last = t;
+    theta = (theta + dt * 1.8) % (Math.PI * 2);
+    var visible = draw();
+    if (visible && !reduce.matches && !document.hidden){
+      window.requestAnimationFrame(frame);
+    } else {
+      animating = false; last = 0;
+    }
+  }
+  function kick(){
+    if (!reduce.matches && !animating && window.scrollY * K < 420){
+      animating = true; window.requestAnimationFrame(frame);
+    } else if (!queued){
+      queued = true; window.requestAnimationFrame(draw);
+    }
+  }
+  function resize(){
+    dpr = Math.min(2, window.devicePixelRatio || 1);
+    W = window.innerWidth; H = window.innerHeight;
+    cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
+    docH = document.documentElement.scrollHeight;
+    draw(); kick();
+  }
+
+  readColors();
+  resize();
+  window.addEventListener('resize', resize);
+  window.addEventListener('scroll', kick, { passive: true });
+  window.addEventListener('load', resize);          // hauteur finale une fois les images chargées
+  document.addEventListener('visibilitychange', kick);
+  if (dark.addEventListener) dark.addEventListener('change', function(){ readColors(); draw(); });
+  if (window.ResizeObserver) new ResizeObserver(function(){
+    var h = document.documentElement.scrollHeight;
+    if (h !== docH){ docH = h; draw(); }
+  }).observe(document.body);
+})();
+</script>
+<script>
+// Visionneuse de la galerie : sans JavaScript, chaque photo s'ouvre simplement dans le navigateur
+(function(){
+  var lb = document.getElementById('lb');
+  if (!lb || typeof lb.showModal !== 'function') return;
+  var shots = Array.prototype.slice.call(document.querySelectorAll('#gallery .shot'));
+  var img = document.getElementById('lb-img');
+  var cap = document.getElementById('lb-cap');
+  var current = 0;
+  function show(i){
+    current = (i + shots.length) % shots.length;
+    var a = shots[current];
+    img.src = a.getAttribute('href');
+    img.alt = a.dataset.cap;
+    cap.textContent = a.dataset.cap + ' (' + (current + 1) + '/' + shots.length + ')';
+  }
+  shots.forEach(function(a, i){
+    a.addEventListener('click', function(e){ e.preventDefault(); show(i); lb.showModal(); });
+  });
+  document.getElementById('lb-prev').addEventListener('click', function(){ show(current - 1); });
+  document.getElementById('lb-next').addEventListener('click', function(){ show(current + 1); });
+  document.getElementById('lb-close').addEventListener('click', function(){ lb.close(); });
+  lb.addEventListener('click', function(e){ if (e.target === lb) lb.close(); });
+  lb.addEventListener('keydown', function(e){
+    if (e.key === 'ArrowLeft') show(current - 1);
+    if (e.key === 'ArrowRight') show(current + 1);
+  });
+})();
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script>
+(function(){
+  var LIMIT = 10 * 1024 * 1024;      // limite FormSubmit : 10 Mo au total par envoi
+  var RAW_MAX = 150 * 1024 * 1024;   // au-delà, inutile de compresser : WeTransfer directement
+  var form = document.getElementById('quote-form');
+  var input = document.getElementById('q-files');
+  var list = document.getElementById('q-list');
+  var drop = document.getElementById('q-drop');
+  var gauge = document.getElementById('q-gauge');
+  var gaugeFill = document.getElementById('q-gauge-fill');
+  var gaugeUsed = document.getElementById('q-gauge-used');
+  var gaugeDetail = document.getElementById('q-gauge-detail');
+  var wtBox = document.getElementById('q-wt');
+  var linkInput = document.getElementById('q-link');
+  var slot = document.getElementById('q-files-slot');
+  var errorBox = document.getElementById('q-error');
+  var sendBtn = document.getElementById('q-send');
+
+  var files = [];          // { file: File, name: nom unique dans le zip }
+  var zipBlob = null;      // résultat de la compression
+  var zipping = false;
+  var progress = 0;
+  var job = 0;             // annule les compressions devenues obsolètes
+  var sending = false;
+  var hasZip = typeof JSZip !== 'undefined';
+
+  // Page de remerciement : calculée à partir de l'adresse du site, rien à modifier.
+  // FormSubmit exige une adresse complète en http(s). Dans un aperçu (about:srcdoc, about:blank…)
+  // ce calcul est impossible : on retire le champ et FormSubmit affiche sa propre page de confirmation.
+  (function(){
+    var nextField = document.getElementById('f-next');
+    try {
+      var next = new URL('merci.html', document.baseURI || location.href);
+      if (next.protocol === 'http:' || next.protocol === 'https:') {
+        nextField.value = next.href;
+        return;
+      }
+    } catch (err) { /* adresse de base invalide : on ignore */ }
+    nextField.remove();
+  })();
+
+  function fmt(b){
+    return b < 1024 * 1024
+      ? Math.max(1, Math.round(b / 1024)) + ' Ko'
+      : (b / 1024 / 1024).toFixed(1).replace('.', ',') + ' Mo';
+  }
+  function rawTotal(){ return files.reduce(function(s, f){ return s + f.file.size; }, 0); }
+
+  // Taille réellement envoyée : le zip si la compression est disponible, sinon les fichiers bruts
+  function sendSize(){
+    if (!files.length) return 0;
+    if (hasZip && rawTotal() <= RAW_MAX) return zipBlob ? zipBlob.size : null;
+    return rawTotal();
+  }
+  function isOver(){
+    var s = sendSize();
+    return s !== null && s > LIMIT;
+  }
+
+  function uniqueName(name){
+    var taken = files.map(function(f){ return f.name; });
+    if (taken.indexOf(name) === -1) return name;
+    var dot = name.lastIndexOf('.');
+    var base = dot > 0 ? name.slice(0, dot) : name;
+    var ext = dot > 0 ? name.slice(dot) : '';
+    var i = 2;
+    while (taken.indexOf(base + ' (' + i + ')' + ext) !== -1) i++;
+    return base + ' (' + i + ')' + ext;
+  }
+
+  function render(){
+    list.innerHTML = '';
+    files.forEach(function(entry, i){
+      var li = document.createElement('li');
+      var n = document.createElement('span'); n.className = 'fname'; n.textContent = entry.name;
+      var s = document.createElement('span'); s.className = 'fsize'; s.textContent = fmt(entry.file.size);
+      var b = document.createElement('button'); b.type = 'button'; b.textContent = '×';
+      b.setAttribute('aria-label', 'Retirer ' + entry.name);
+      b.addEventListener('click', function(){ files.splice(i, 1); compress(); });
+      li.append(n, s, b); list.append(li);
+    });
+
+    gauge.hidden = files.length === 0;
+    gauge.classList.remove('busy', 'over');
+    errorBox.textContent = '';
+    wtBox.classList.remove('highlight');
+
+    if (!files.length){
+      gaugeDetail.textContent = '';
+    } else if (zipping){
+      gauge.classList.add('busy');
+      gaugeFill.style.width = Math.max(8, progress) + '%';
+      gaugeUsed.textContent = 'Compression… ' + Math.round(progress) + ' %';
+      gaugeDetail.textContent = fmt(rawTotal()) + ' avant compression';
+    } else {
+      var size = sendSize();
+      var raw = rawTotal();
+      gaugeFill.style.width = Math.min(100, size / LIMIT * 100) + '%';
+      gaugeUsed.textContent = fmt(size);
+      if (hasZip && raw <= RAW_MAX){
+        var saved = raw > 0 ? Math.round((1 - size / raw) * 100) : 0;
+        gaugeDetail.textContent = 'Compressé en .zip, ' + fmt(raw) + ' au départ'
+          + (saved > 0 ? ' (−' + saved + ' %)' : '');
+      } else if (raw > RAW_MAX){
+        gaugeDetail.textContent = 'Fichiers trop lourds pour être compressés ici.';
+      } else {
+        gaugeDetail.textContent = 'Compression indisponible sur ce navigateur.';
+      }
+      if (size > LIMIT){
+        gauge.classList.add('over');
+        wtBox.classList.add('highlight');
+        errorBox.textContent = (hasZip && raw <= RAW_MAX ? 'Même compressés, vos fichiers font ' : 'Vos fichiers font ')
+          + fmt(size) + ', au-dessus de la limite de 10 Mo. Envoyez-les avec WeTransfer, collez le lien dans le cadre ci-dessus, puis retirez-les de la liste.';
+      }
+    }
+    if (!sending){
+      sendBtn.disabled = isOver();
+      sendBtn.textContent = 'Envoyer ma demande';
+    }
+  }
+
+  function compress(){
+    var my = ++job;
+    zipBlob = null;
+    progress = 0;
+    zipping = false;
+    if (!files.length || !hasZip || rawTotal() > RAW_MAX){ render(); return; }
+    zipping = true;
+    render();
+    var zip = new JSZip();
+    files.forEach(function(entry){ zip.file(entry.name, entry.file); });
+    zip.generateAsync(
+      { type: 'blob', compression: 'DEFLATE', compressionOptions: { level: 6 }, mimeType: 'application/zip' },
+      function(meta){
+        if (my !== job) return;
+        progress = meta.percent;
+        gaugeFill.style.width = Math.max(8, progress) + '%';
+        gaugeUsed.textContent = 'Compression… ' + Math.round(progress) + ' %';
+      }
+    ).then(function(blob){
+      if (my !== job) return;
+      zipBlob = blob; zipping = false; render();
+    }).catch(function(){
+      if (my !== job) return;
+      hasZip = false; zipping = false; render();   // repli : envoi des fichiers sans compression
+    });
+  }
+
+  function addFiles(fl){
+    Array.prototype.forEach.call(fl, function(file){
+      var dup = files.some(function(f){
+        return f.file.name === file.name && f.file.size === file.size && f.file.lastModified === file.lastModified;
+      });
+      if (!dup) files.push({ file: file, name: uniqueName(file.name) });
+    });
+    compress();
+  }
+
+  input.addEventListener('change', function(){ addFiles(input.files); input.value = ''; });
+  ['dragenter', 'dragover'].forEach(function(t){
+    drop.addEventListener(t, function(e){ e.preventDefault(); drop.classList.add('over'); });
+  });
+  ['dragleave', 'drop'].forEach(function(t){
+    drop.addEventListener(t, function(){ drop.classList.remove('over'); });
+  });
+  drop.addEventListener('drop', function(e){
+    e.preventDefault();
+    if (e.dataTransfer && e.dataTransfer.files) addFiles(e.dataTransfer.files);
+  });
+
+  function waitForZip(){
+    return new Promise(function(resolve){
+      (function check(){ zipping ? setTimeout(check, 100) : resolve(); })();
+    });
+  }
+
+  function zipFileName(){
+    var p = document.getElementById('q-name').value.trim().toLowerCase()
+      .normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+    var d = new Date();
+    var stamp = d.getFullYear() + String(d.getMonth() + 1).padStart(2, '0') + String(d.getDate()).padStart(2, '0');
+    return 'devis-' + (p || 'client') + '-' + stamp + '.zip';
+  }
+
+  function attach(file, name){
+    var dt = new DataTransfer();
+    dt.items.add(file);
+    var fi = document.createElement('input');
+    fi.type = 'file';
+    fi.name = name;
+    fi.files = dt.files;
+    slot.append(fi);
+  }
+
+  function resetButton(){
+    sending = false;
+    render();
+  }
+
+  // Le navigateur a déjà vérifié les champs obligatoires quand cet événement se déclenche
+  form.addEventListener('submit', function(e){
+    e.preventDefault();
+    if (sending) return;
+    if (isOver()){ render(); return; }
+
+    var prenom = document.getElementById('q-name').value.trim();
+    var type = document.getElementById('q-type').value;
+    document.getElementById('f-subject').value = 'Devis BG3d81 : ' + type + (prenom ? ' (' + prenom + ')' : '');
+
+    sending = true;
+    sendBtn.disabled = true;
+    sendBtn.textContent = files.length ? 'Préparation des fichiers…' : 'Envoi en cours…';
+
+    waitForZip().then(function(){
+      if (isOver()){ resetButton(); return; }
+      slot.innerHTML = '';
+      try {
+        if (files.length && zipBlob){
+          attach(new File([zipBlob], zipFileName(), { type: 'application/zip' }), 'Fichiers (zip)');
+        } else {
+          files.forEach(function(entry, i){ attach(entry.file, 'Fichier ' + (i + 1)); });
+        }
+      } catch (err) {
+        errorBox.textContent = "Votre navigateur ne permet pas d'envoyer les fichiers depuis ce formulaire. Utilisez WeTransfer ci-dessus, ou écrivez-moi à bg3d81@gmail.com.";
+        sending = false;
+        sendBtn.disabled = false;
+        sendBtn.textContent = 'Envoyer ma demande';
+        return;
+      }
+      sendBtn.textContent = 'Envoi en cours…';
+      form.submit();
+    });
+  });
+
+  // Si le visiteur revient en arrière après l'envoi, le bouton redevient utilisable
+  window.addEventListener('pageshow', resetButton);
+  linkInput.addEventListener('input', function(){ if (!isOver()) errorBox.textContent = ''; });
+})();
+</script>
+</body>
+</html>
