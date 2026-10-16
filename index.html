@@ -484,6 +484,7 @@ footer .brand{font-family:var(--f-brand);font-size:.85rem;color:var(--ink)}
           <input type="hidden" name="_subject" id="f-subject" value="Nouvelle demande de devis (site BG3d81)">
           <input type="hidden" name="_next" id="f-next" value="">
           <input type="hidden" name="_template" value="table">
+          <input type="hidden" name="Dimensions" id="f-dims" value="">
           <div class="honey" aria-hidden="true"><label for="f-honey">Ne pas remplir</label><input type="text" name="_honey" id="f-honey" tabindex="-1" autocomplete="off"></div>
 
           <div class="row">
@@ -492,7 +493,7 @@ footer .brand{font-family:var(--f-brand);font-size:.85rem;color:var(--ink)}
           </div>
           <div class="row">
             <label for="q-type"><span class="lt">Type de demande</span>
-              <select id="q-type" name="Type de demande">
+              <select id="q-type" name="Demande">
                 <option>Impression de mon fichier</option>
                 <option>Pièce de remplacement</option>
                 <option>Conception sur mesure</option>
@@ -511,9 +512,9 @@ footer .brand{font-family:var(--f-brand);font-size:.85rem;color:var(--ink)}
             </label>
           </div>
           <div class="row">
-            <label for="q-l"><span class="lt">Longueur <small>mm</small></span><input id="q-l" name="Longueur (mm)" type="number" min="0" step="0.1" inputmode="decimal"></label>
-            <label for="q-w"><span class="lt">Largeur <small>mm</small></span><input id="q-w" name="Largeur (mm)" type="number" min="0" step="0.1" inputmode="decimal"></label>
-            <label for="q-h"><span class="lt">Hauteur <small>mm</small></span><input id="q-h" name="Hauteur (mm)" type="number" min="0" step="0.1" inputmode="decimal"></label>
+            <label for="q-l"><span class="lt">Longueur <small>mm</small></span><input id="q-l" type="number" min="0" step="0.1" inputmode="decimal"></label>
+            <label for="q-w"><span class="lt">Largeur <small>mm</small></span><input id="q-w" type="number" min="0" step="0.1" inputmode="decimal"></label>
+            <label for="q-h"><span class="lt">Hauteur <small>mm</small></span><input id="q-h" type="number" min="0" step="0.1" inputmode="decimal"></label>
           </div>
           <div class="row">
             <label for="q-qty"><span class="lt">Quantité</span><input id="q-qty" name="Quantité" type="number" min="1" value="1"></label>
@@ -527,7 +528,7 @@ footer .brand{font-family:var(--f-brand);font-size:.85rem;color:var(--ink)}
             </label>
           </div>
           <label for="q-part"><span class="lt">Pièce d'origine</span>
-            <select id="q-part" name="Pièce d'origine">
+            <select id="q-part" name="Pièce">
               <option>Je n'envoie pas de pièce</option>
               <option>Je peux envoyer la pièce cassée</option>
               <option>Je peux envoyer une pièce identique en bon état</option>
@@ -558,7 +559,7 @@ footer .brand{font-family:var(--f-brand);font-size:.85rem;color:var(--ink)}
               <a class="btn btn-ghost btn-sm" href="https://wetransfer.com/" target="_blank" rel="noopener">Ouvrir WeTransfer ↗</a>
             </div>
             <p>Envoyez-les gratuitement avec WeTransfer : ajoutez vos fichiers, choisissez « Obtenir un lien » dans les options, puis collez ce lien ici.</p>
-            <label for="q-link"><span class="lt">Lien WeTransfer ou Google Drive</span><input id="q-link" name="Lien fichiers" type="url" placeholder="https://we.tl/…"></label>
+            <label for="q-link"><span class="lt">Lien WeTransfer ou Google Drive</span><input id="q-link" name="Lien" type="url" placeholder="https://we.tl/…"></label>
           </div>
 
           <div id="q-files-slot" hidden></div>
@@ -1029,6 +1030,12 @@ footer .brand{font-family:var(--f-brand);font-size:.85rem;color:var(--ink)}
     var prenom = document.getElementById('q-name').value.trim();
     var type = document.getElementById('q-type').value;
     document.getElementById('f-subject').value = 'Devis BG3d81 : ' + type + (prenom ? ' (' + prenom + ')' : '');
+
+    // Les trois dimensions regroupées sur une seule ligne dans le mail
+    var dims = ['q-l', 'q-w', 'q-h'].map(function(id){ return document.getElementById(id).value.trim().replace('.', ','); });
+    document.getElementById('f-dims').value = dims.some(Boolean)
+      ? dims.map(function(d){ return d || '?'; }).join(' × ') + ' mm (L × l × h)'
+      : 'Non précisées';
 
     sending = true;
     sendBtn.disabled = true;
