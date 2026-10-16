@@ -8,7 +8,7 @@ Site vitrine de **BG3d81** : impression 3D sur mesure en PETG à Graulhet (Tarn)
 - Prototypes et boîtiers
 - Accessoires pour camping-car vendus sur [eBay](https://www.ebay.fr/usr/bg3d-81)
 
-Site en ligne : https://nanou974.github.io/bg3d81/
+Site en ligne : https://nanou974.github.io/BG3d81/
 
 ## Contenu
 
