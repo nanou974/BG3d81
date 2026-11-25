@@ -236,6 +236,9 @@ footer .brand{font-family:var(--f-brand);font-size:.85rem;color:var(--ink)}
 @media (max-width:560px){ .services{grid-template-columns:1fr} }
 @media (max-width:520px){ nav{display:none} .gallery{grid-auto-rows:160px} }
 @media (prefers-reduced-motion:reduce){ html{scroll-behavior:auto} .gauge-fill,.shot img{transition:none} .shot:hover img{transform:none} }
+  .projet-rendu{margin:0 0 2rem}
+  .projet-rendu img{display:block;width:100%;height:auto;border-radius:8px}
+  .projet-rendu figcaption{margin-top:.6rem;font-size:.9rem;opacity:.8}
 </style>
 </head>
 <body>
@@ -392,6 +395,10 @@ footer .brand{font-family:var(--f-brand);font-size:.85rem;color:var(--ink)}
         <h2>Logiciels et électronique</h2>
         <p>Des projets personnels, partagés en libre accès.</p>
       </div>
+      <figure class="projet-rendu">
+        <img src="img/projets/klipper-smart-boitier.png" alt="Rendus 3D du boîtier de KlipperSmart, vues de trois côtés" loading="lazy">
+        <figcaption>Boîtier de KlipperSmart, modélisé pour accueillir la carte ESP32-S3 et l'écran 3,5 pouces.</figcaption>
+      </figure>
       <div class="products">
         <article class="product">
           <div class="body">
